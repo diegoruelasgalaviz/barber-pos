@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "5Ty7939r8peBOT7WrDs7zF3ngrE0k4XVMCisGpIOaO8=",
+  "Source": "barber-backend",
+  "BasePath": "_content/barber-backend",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

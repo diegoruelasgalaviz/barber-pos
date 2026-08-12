@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../build/barber-backend.props" />
+</Project>
