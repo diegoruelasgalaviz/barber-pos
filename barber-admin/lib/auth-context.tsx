@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo, useSyncExternalStore } from "react";
 import type { AuthUser, Role } from "./types";
-import { MOCK_USERS } from "./mock-data";
+import { api, ApiError, setToken } from "./api";
 
 const SESSION_KEY = "barber_admin_session";
 
@@ -58,29 +58,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const status: AuthContextValue["status"] = user ? "authenticated" : "unauthenticated";
 
   const signIn = useCallback(async (email: string, password: string) => {
-    // Simulated network latency so the UI can show a loading state.
-    await new Promise((r) => setTimeout(r, 400));
-    const match = MOCK_USERS.find((u) => u.email.toLowerCase() === email.trim().toLowerCase());
-    if (!match) {
-      return { ok: false, error: "No account found with that email." };
+    try {
+      const res = await api.post<{ token: string; user: Omit<AuthUser, "role"> & { role: Role | "customer" } }>("/api/auth/login", {
+        email: email.trim(),
+        password,
+      });
+      if (res.user.role === "customer") {
+        return { ok: false, error: "This account doesn't have admin access." };
+      }
+      setToken(res.token);
+      setSession(res.user as AuthUser);
+      return { ok: true };
+    } catch (err) {
+      if (err instanceof ApiError) {
+        return { ok: false, error: err.status === 401 ? "Incorrect email or password." : err.message };
+      }
+      return { ok: false, error: "Could not reach the server. Please try again." };
     }
-    if (match.password !== password) {
-      return { ok: false, error: "Incorrect password." };
-    }
-    const { password: _pw, ...publicUser } = match;
-    void _pw;
-    setSession(publicUser);
-    return { ok: true };
   }, []);
 
   const signOut = useCallback(() => {
+    setToken(null);
     setSession(null);
   }, []);
 
   const requestPasswordReset = useCallback(async (email: string) => {
-    await new Promise((r) => setTimeout(r, 500));
-    // Don't leak whether an account exists; mimic a real backend's response.
-    void MOCK_USERS.find((u) => u.email.toLowerCase() === email.trim().toLowerCase());
+    // No dedicated reset-email flow on the backend yet; mimic a real
+    // backend's response without leaking whether the account exists.
+    void email;
+    await new Promise((r) => setTimeout(r, 300));
     return { ok: true };
   }, []);
 

@@ -185,8 +185,8 @@ export function BookingModal({
                   <CustomerForm
                     submitLabel="Add & continue"
                     onCancel={() => setShowQuickAdd(false)}
-                    onSubmit={(values) => {
-                      const c = addCustomer(values);
+                    onSubmit={async (values) => {
+                      const c = await addCustomer(values);
                       setCustomerId(c.id);
                       setShowQuickAdd(false);
                     }}

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { RequireAuth } from "@/components/RequireAuth";
 import { useAuth } from "@/lib/auth-context";
 import { useBooking } from "@/lib/booking-context";
-import { BARBERS, SERVICES } from "@/lib/mock-data";
+import { useCatalog } from "@/lib/catalog-context";
 import { Card, CardBody } from "@/components/ui/Card";
 import { StatusBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -61,8 +61,9 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 function AppointmentRow({ appointment }: { appointment: Appointment }) {
-  const service = SERVICES.find((s) => s.id === appointment.serviceId);
-  const barber = BARBERS.find((b) => b.id === appointment.barberId);
+  const { services, barbers } = useCatalog();
+  const service = services.find((s) => s.id === appointment.serviceId);
+  const barber = barbers.find((b) => b.id === appointment.barberId);
 
   return (
     <Card>

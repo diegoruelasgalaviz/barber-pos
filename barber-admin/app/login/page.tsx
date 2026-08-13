@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { MOCK_USERS } from "@/lib/mock-data";
 import { Button } from "@/components/ui/Button";
 import { Field, TextInput } from "@/components/ui/Field";
 
@@ -33,9 +32,9 @@ export default function LoginPage() {
     router.replace("/appointments");
   }
 
-  function fillDemo(role: (typeof MOCK_USERS)[number]) {
-    setEmail(role.email);
-    setPassword(role.password);
+  function fillDemo() {
+    setEmail("owner@barber.dev");
+    setPassword("password123");
   }
 
   return (
@@ -89,20 +88,15 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-5 rounded-xl border border-dashed border-zinc-300 p-4 text-xs text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-          <p className="mb-2 font-medium text-zinc-600 dark:text-zinc-300">Demo accounts (mocked auth — password is &quot;password&quot;)</p>
-          <div className="space-y-1.5">
-            {MOCK_USERS.map((u) => (
-              <button
-                key={u.id}
-                type="button"
-                onClick={() => fillDemo(u)}
-                className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left hover:bg-zinc-100 dark:hover:bg-zinc-800"
-              >
-                <span className="capitalize">{u.role}</span>
-                <span className="font-mono">{u.email}</span>
-              </button>
-            ))}
-          </div>
+          <p className="mb-2 font-medium text-zinc-600 dark:text-zinc-300">Demo account (seeded in barber-backend)</p>
+          <button
+            type="button"
+            onClick={fillDemo}
+            className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left hover:bg-zinc-100 dark:hover:bg-zinc-800"
+          >
+            <span className="capitalize">owner</span>
+            <span className="font-mono">owner@barber.dev</span>
+          </button>
         </div>
       </div>
     </div>

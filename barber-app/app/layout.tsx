@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { BookingProvider } from "@/lib/booking-context";
+import { CatalogProvider } from "@/lib/catalog-context";
 import { Navbar } from "@/components/layout/Navbar";
 
 const geistSans = Geist({
@@ -28,10 +29,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col bg-zinc-50 dark:bg-zinc-950">
         <AuthProvider>
-          <BookingProvider>
-            <Navbar />
-            <main className="flex-1">{children}</main>
-          </BookingProvider>
+          <CatalogProvider>
+            <BookingProvider>
+              <Navbar />
+              <main className="flex-1">{children}</main>
+            </BookingProvider>
+          </CatalogProvider>
         </AuthProvider>
       </body>
     </html>

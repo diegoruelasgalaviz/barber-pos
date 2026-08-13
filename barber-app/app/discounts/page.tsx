@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { RequireAuth } from "@/components/RequireAuth";
-import { DISCOUNTS } from "@/lib/mock-data";
+import { useCatalog } from "@/lib/catalog-context";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { formatDateMedium } from "@/lib/utils";
 
 function DiscountsList() {
+  const { discounts: DISCOUNTS } = useCatalog();
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Special Discounts</h1>

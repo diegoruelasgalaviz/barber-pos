@@ -4,11 +4,12 @@ import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/Button";
 import { Card, CardBody } from "@/components/ui/Card";
-import { SERVICES, BARBERS } from "@/lib/mock-data";
+import { useCatalog } from "@/lib/catalog-context";
 import { formatCurrency } from "@/lib/utils";
 
 export default function Home() {
   const { status } = useAuth();
+  const { services: SERVICES, barbers: BARBERS } = useCatalog();
 
   return (
     <div>
