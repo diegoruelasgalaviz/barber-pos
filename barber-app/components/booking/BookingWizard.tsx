@@ -4,9 +4,9 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
 import { useBooking } from "@/lib/booking-context";
-import { BARBERS, DISCOUNTS, SERVICES, generateTimeSlots } from "@/lib/mock-data";
+import { useCatalog } from "@/lib/catalog-context";
 import type { Appointment, PaymentMethod } from "@/lib/types";
-import { addDaysIso, cn, formatCurrency, formatDateLong, formatTime, todayIso } from "@/lib/utils";
+import { addDaysIso, cn, formatCurrency, formatDateLong, formatTime, generateTimeSlots, todayIso } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Field, TextInput } from "@/components/ui/Field";
@@ -19,6 +19,7 @@ const UPCOMING_DAYS = Array.from({ length: 7 }, (_, i) => addDaysIso(todayIso(),
 export function BookingWizard() {
   const { user, status } = useAuth();
   const { addAppointment } = useBooking();
+  const { services: SERVICES, barbers: BARBERS, discounts: DISCOUNTS } = useCatalog();
   const steps = status === "authenticated" ? STEPS_ACCOUNT : STEPS_GUEST;
 
   const [stepIndex, setStepIndex] = useState(0);
@@ -32,12 +33,12 @@ export function BookingWizard() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
   const [confirmedAppointment, setConfirmedAppointment] = useState<Appointment | null>(null);
 
-  const service = useMemo(() => SERVICES.find((s) => s.id === serviceId), [serviceId]);
-  const barber = useMemo(() => BARBERS.find((b) => b.id === barberId), [barberId]);
-  const discount = useMemo(() => DISCOUNTS.find((d) => d.id === discountId), [discountId]);
+  const service = useMemo(() => SERVICES.find((s) => s.id === serviceId), [SERVICES, serviceId]);
+  const barber = useMemo(() => BARBERS.find((b) => b.id === barberId), [BARBERS, barberId]);
+  const discount = useMemo(() => DISCOUNTS.find((d) => d.id === discountId), [DISCOUNTS, discountId]);
   const eligibleBarbers = useMemo(
     () => (serviceId ? BARBERS.filter((b) => b.serviceIds.includes(serviceId)) : BARBERS),
-    [serviceId],
+    [BARBERS, serviceId],
   );
   const timeSlots = useMemo(() => generateTimeSlots(), []);
 
@@ -67,9 +68,9 @@ export function BookingWizard() {
   const goNext = () => setStepIndex((i) => Math.min(i + 1, steps.length - 1));
   const goBack = () => setStepIndex((i) => Math.max(i - 1, 0));
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!service || !barber || !date || !time || !paymentMethod) return;
-    const appointment = addAppointment({
+    const appointment = await addAppointment({
       customerId: user?.id ?? null,
       guestName: status === "authenticated" ? undefined : guestName,
       guestContact: status === "authenticated" ? undefined : guestContact,
@@ -77,6 +78,7 @@ export function BookingWizard() {
       serviceId: service.id,
       date,
       startTime: time,
+      durationMinutes: service.durationMinutes,
       paymentMethod,
       paymentStatus: paymentMethod === "online" ? "paid" : "due-at-shop",
       discountId: discount?.id,

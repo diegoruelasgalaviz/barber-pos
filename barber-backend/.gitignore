@@ -1,0 +1,15 @@
+## .NET build output
+[Bb]in/
+[Oo]bj/
+
+## Embedded dev Postgres (downloaded binaries + per-run data/instance dirs)
+/pg_embed
+
+## User-specific / IDE files
+*.user
+*.suo
+.vs/
+.vscode/
+
+## Misc
+*.log

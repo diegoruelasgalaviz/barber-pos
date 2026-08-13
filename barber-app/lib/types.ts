@@ -1,7 +1,6 @@
 // Shared domain types for the barber-app customer-facing booking surface.
-// These mirror the shape we expect the real barber-backend API to
-// eventually return; until those endpoints exist, all data is mocked
-// locally (see lib/mock-data.ts) and mutated in-memory via lib/booking-context.tsx.
+// These mirror the shapes returned by the real barber-backend API
+// (see lib/api.ts, lib/catalog-context.tsx and lib/booking-context.tsx).
 
 export interface AuthUser {
   id: string;

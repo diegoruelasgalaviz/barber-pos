@@ -1,7 +1,6 @@
 // Shared domain types for the barber-admin POS admin surface.
-// These mirror the shape we expect the real barber-backend API to
-// eventually return; until those endpoints exist, all data is mocked
-// locally (see lib/mock-data.ts) and mutated in-memory via lib/data-store.tsx.
+// These mirror the shapes returned by the real barber-backend API
+// (see lib/api.ts and lib/data-store.tsx).
 
 export type Role = "owner" | "admin" | "staff";
 

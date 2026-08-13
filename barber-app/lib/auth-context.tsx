@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { AuthUser } from "./types";
-import { MOCK_USERS } from "./mock-data";
+import { api, ApiError, setToken } from "./api";
 
 const SESSION_KEY = "barber_app_session";
 
@@ -57,34 +57,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = useCallback(async (email: string, password: string) => {
-    await new Promise((r) => setTimeout(r, 400));
-    const match = MOCK_USERS.find((u) => u.email.toLowerCase() === email.trim().toLowerCase());
-    if (!match) return { ok: false, error: "No account found with that email." };
-    if (match.password !== password) return { ok: false, error: "Incorrect password." };
-    const { password: _pw, ...publicUser } = match;
-    void _pw;
-    setSession(publicUser);
-    return { ok: true };
+    try {
+      const res = await api.post<{ token: string; user: AuthUser }>("/api/auth/login", { email: email.trim(), password });
+      setToken(res.token);
+      setSession(res.user);
+      return { ok: true };
+    } catch (err) {
+      if (err instanceof ApiError) {
+        return { ok: false, error: err.status === 401 ? "Incorrect email or password." : err.message };
+      }
+      return { ok: false, error: "Could not reach the server. Please try again." };
+    }
   }, []);
 
   const register = useCallback(async (name: string, email: string, phone: string, password: string) => {
-    await new Promise((r) => setTimeout(r, 400));
-    if (MOCK_USERS.some((u) => u.email.toLowerCase() === email.trim().toLowerCase())) {
-      return { ok: false, error: "An account with that email already exists." };
+    try {
+      const res = await api.post<{ token: string; user: AuthUser }>("/api/auth/register", {
+        name,
+        email: email.trim(),
+        phone,
+        password,
+      });
+      setToken(res.token);
+      setSession(res.user);
+      return { ok: true };
+    } catch (err) {
+      if (err instanceof ApiError) {
+        return { ok: false, error: err.status === 409 ? "An account with that email already exists." : err.message };
+      }
+      return { ok: false, error: "Could not reach the server. Please try again." };
     }
-    const newUser: AuthUser = {
-      id: `cust-${Date.now()}`,
-      name,
-      email,
-      phone,
-      avatarColor: "#0ea5e9",
-    };
-    MOCK_USERS.push({ ...newUser, password });
-    setSession(newUser);
-    return { ok: true };
   }, []);
 
-  const signOut = useCallback(() => setSession(null), []);
+  const signOut = useCallback(() => {
+    setToken(null);
+    setSession(null);
+  }, []);
 
   const value = useMemo(
     () => ({ user, status, signIn, register, signOut }),
